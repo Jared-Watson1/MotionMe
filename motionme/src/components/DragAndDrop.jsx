@@ -15,7 +15,7 @@ function DragAndDrop({ onFileChange }) {
 
   return (
     <div 
-      className="flex items-center justify-center w-full mb-4"
+      className="flex items-center justify-center w-full mb-4 mt-3"
       onDrop={handleFileDrop}
       onDragOver={handleDragOver}
     >

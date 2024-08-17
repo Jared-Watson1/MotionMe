@@ -24,8 +24,9 @@ function CanvasEditor({ selectedFile, onDownload }) {
     img.src = URL.createObjectURL(selectedFile);
     img.onload = () => {
       const aspectRatio = img.width / img.height;
-      const maxWidth = window.innerWidth * 0.67;
-      const maxHeight = window.innerHeight * 0.67;
+      const screenWidth = window.innerWidth;
+      const maxWidth = screenWidth < 768 ? screenWidth * 0.9 : screenWidth * 0.6; // Scale down on smaller screens
+      const maxHeight = window.innerHeight * 0.7;
 
       let width, height;
 
@@ -97,7 +98,6 @@ function CanvasEditor({ selectedFile, onDownload }) {
   const handleMouseDownToDragOrResize = (event) => {
     const { x, y } = getMousePosition(event);
 
-    // Check if any handle is clicked
     const asset = assets[selectedAssetIndex];
     const handle = asset ? getClickedHandle(x, y, asset) : null;
 
@@ -108,7 +108,6 @@ function CanvasEditor({ selectedFile, onDownload }) {
       setInitialPosition({ x: asset.x, y: asset.y });
       setInitialSize({ width: asset.width, height: asset.height });
     } else {
-      // Check if any asset's bounding box is clicked
       const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
       if (clickedAssetIndex !== -1) {
         setSelectedAssetIndex(clickedAssetIndex);
@@ -126,16 +125,15 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const { x, y } = getMousePosition(event);
     const asset = assets[selectedAssetIndex];
 
-    // Update cursor when hovering over a handle
     if (asset) {
-        const handle = getClickedHandle(x, y, asset);
-        if (handle) {
-            canvas.style.cursor = handle.cursor;
-        } else {
-            canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
-        }
+      const handle = getClickedHandle(x, y, asset);
+      if (handle) {
+        canvas.style.cursor = handle.cursor;
+      } else {
+        canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
+      }
     } else {
-        canvas.style.cursor = 'default';
+      canvas.style.cursor = 'default';
     }
 
     if (selectedAssetIndex === null) return;
@@ -144,67 +142,77 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const dy = y - dragStart.y;
 
     if (isDragging) {
-        setAssets((prevAssets) => {
-            const updatedAssets = [...prevAssets];
-            const asset = updatedAssets[selectedAssetIndex];
-            asset.x = initialPosition.x + dx;
-            asset.y = initialPosition.y + dy;
-            return updatedAssets;
-        });
+      setAssets((prevAssets) => {
+        const updatedAssets = [...prevAssets];
+        const asset = updatedAssets[selectedAssetIndex];
+        asset.x = initialPosition.x + dx;
+        asset.y = initialPosition.y + dy;
+        return updatedAssets;
+      });
     } else if (isResizing) {
-        setAssets((prevAssets) => {
-            const updatedAssets = [...prevAssets];
-            const asset = updatedAssets[selectedAssetIndex];
+      setAssets((prevAssets) => {
+        const updatedAssets = [...prevAssets];
+        const asset = updatedAssets[selectedAssetIndex];
 
-            let newWidth = initialSize.width;
-            let newHeight = initialSize.height;
-            let newX = initialPosition.x;
-            let newY = initialPosition.y;
+        let newWidth = initialSize.width;
+        let newHeight = initialSize.height;
+        let newX = initialPosition.x;
+        let newY = initialPosition.y;
 
-            if (resizeHandle.includes('right')) {
-                newWidth = initialSize.width + dx;
-            } else if (resizeHandle.includes('left')) {
-                newWidth = initialSize.width - dx;
-                newX = initialPosition.x + dx;
-            }
+        if (resizeHandle.includes('right')) {
+          newWidth = initialSize.width + dx;
+        } else if (resizeHandle.includes('left')) {
+          newWidth = initialSize.width - dx;
+          newX = initialPosition.x + dx;
+        }
 
-            if (resizeHandle.includes('bottom')) {
-                newHeight = initialSize.height + dy;
-            } else if (resizeHandle.includes('top')) {
-                newHeight = initialSize.height - dy;
-                newY = initialPosition.y + dy;
-            }
+        if (resizeHandle.includes('bottom')) {
+          newHeight = initialSize.height + dy;
+        } else if (resizeHandle.includes('top')) {
+          newHeight = initialSize.height - dy;
+          newY = initialPosition.y + dy;
+        }
 
-            if (event.shiftKey) {
-                // Maintain aspect ratio when Shift key is held
-                const aspectRatio = initialSize.width / initialSize.height;
-                if (newWidth / aspectRatio > newHeight) {
-                    newHeight = newWidth / aspectRatio;
-                } else {
-                    newWidth = newHeight * aspectRatio;
-                }
-            }
+        if (event.shiftKey) {
+          const aspectRatio = initialSize.width / initialSize.height;
+          if (newWidth / aspectRatio > newHeight) {
+            newHeight = newWidth / aspectRatio;
+          } else {
+            newWidth = newHeight * aspectRatio;
+          }
+        }
 
-            if (newWidth > 0 && newHeight > 0) {
-                asset.x = newX;
-                asset.y = newY;
-                asset.width = newWidth;
-                asset.height = newHeight;
-            }
+        if (newWidth > 0 && newHeight > 0) {
+          asset.x = newX;
+          asset.y = newY;
+          asset.width = newWidth;
+          asset.height = newHeight;
+        }
 
-            return updatedAssets;
-        });
+        return updatedAssets;
+      });
     }
-};
-
-
-
+  };
 
   const handleMouseUp = () => {
     setIsDragging(false);
     setIsResizing(false);
     setResizeHandle(null);
   };
+
+  const handleKeyDown = (event) => {
+    if (selectedAssetIndex !== null && (event.key === 'Delete' || event.key === 'Backspace')) {
+      setAssets((prevAssets) => prevAssets.filter((_, index) => index !== selectedAssetIndex));
+      setSelectedAssetIndex(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedAssetIndex]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
@@ -222,17 +230,15 @@ function CanvasEditor({ selectedFile, onDownload }) {
         ctx.drawImage(img, asset.x, asset.y, asset.width, asset.height);
 
         if (index === selectedAssetIndex) {
-          // Draw the bounding box around the selected asset
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 2;
           ctx.strokeRect(asset.x, asset.y, asset.width, asset.height);
 
-          // Draw the resize handles
           const handles = [
-            { x: asset.x, y: asset.y }, // Top-left
-            { x: asset.x + asset.width, y: asset.y }, // Top-right
-            { x: asset.x, y: asset.y + asset.height }, // Bottom-left
-            { x: asset.x + asset.width, y: asset.y + asset.height }, // Bottom-right
+            { x: asset.x, y: asset.y },
+            { x: asset.x + asset.width, y: asset.y },
+            { x: asset.x, y: asset.y + asset.height },
+            { x: asset.x + asset.width, y: asset.y + asset.height },
           ];
 
           handles.forEach((handle) => {
@@ -280,7 +286,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
         onClick={handleCanvasClick}
       />
       <button
-        className="mt-4 bg-white text-black p-3 rounded-full shadow hover:bg-[#1a1a1a] focus:outline-none"
+        className="mt-4 bg-white text-black p-3 rounded-full shadow hover:bg-[#1a1a1a] focus:outline-none md:ml-4 self-start"
         onClick={handleDownloadClick}
       >
         <FiDownload size={24} />

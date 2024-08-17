@@ -3,11 +3,11 @@ import logo from '../assets/logo.png';
 import glasses from '../assets/sunglasses.png';
 
 function AssetList() {
-  const assets = [logo, glasses]; // You can add more assets here as you add them to your project
+  const assets = [logo, glasses];
 
   return (
-    <div className="p-4">
-      <h2 className="text-white mb-2">Drag and Drop Assets</h2>
+    <div className="md:p-4 p-2 md:max-w-xs w-full">
+      <h2 className="text-white mb-4 text-3xl font-bold">Your Assets</h2>
       {assets.map((asset, index) => (
         <AssetItem key={index} src={asset} />
       ))}
