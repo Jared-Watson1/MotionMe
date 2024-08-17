@@ -143,8 +143,6 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const dx = x - dragStart.x;
     const dy = y - dragStart.y;
 
-    const scalingFactor = 1.0;  // This controls the speed of scaling. Lower value = slower scaling
-
     if (isDragging) {
         setAssets((prevAssets) => {
             const updatedAssets = [...prevAssets];
@@ -158,27 +156,38 @@ function CanvasEditor({ selectedFile, onDownload }) {
             const updatedAssets = [...prevAssets];
             const asset = updatedAssets[selectedAssetIndex];
 
-            let newWidth, newHeight;
+            let newWidth = initialSize.width;
+            let newHeight = initialSize.height;
+            let newX = initialPosition.x;
+            let newY = initialPosition.y;
+
+            if (resizeHandle.includes('right')) {
+                newWidth = initialSize.width + dx;
+            } else if (resizeHandle.includes('left')) {
+                newWidth = initialSize.width - dx;
+                newX = initialPosition.x + dx;
+            }
+
+            if (resizeHandle.includes('bottom')) {
+                newHeight = initialSize.height + dy;
+            } else if (resizeHandle.includes('top')) {
+                newHeight = initialSize.height - dy;
+                newY = initialPosition.y + dy;
+            }
 
             if (event.shiftKey) {
                 // Maintain aspect ratio when Shift key is held
                 const aspectRatio = initialSize.width / initialSize.height;
-                const delta = Math.max(dx, dy) * scalingFactor;
-                newWidth = initialSize.width + delta;
-                newHeight = newWidth / aspectRatio;
-            } else {
-                // Allow freeform scaling
-                newWidth = initialSize.width + dx * scalingFactor;
-                newHeight = initialSize.height + dy * scalingFactor;
+                if (newWidth / aspectRatio > newHeight) {
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newWidth = newHeight * aspectRatio;
+                }
             }
 
             if (newWidth > 0 && newHeight > 0) {
-                if (resizeHandle.includes('left')) {
-                    asset.x = initialPosition.x + initialSize.width - newWidth;
-                }
-                if (resizeHandle.includes('top')) {
-                    asset.y = initialPosition.y + initialSize.height - newHeight;
-                }
+                asset.x = newX;
+                asset.y = newY;
                 asset.width = newWidth;
                 asset.height = newHeight;
             }
@@ -187,6 +196,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
         });
     }
 };
+
 
 
 
