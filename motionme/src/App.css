@@ -57,3 +57,19 @@ body {
   height: 100%;
   font-family: "Got Milk", sans-serif;
 }
+
+h1,
+h2,
+p,
+blockquote {
+  letter-spacing: 0.05em; /* Increase spacing between characters */
+}
+
+h1 {
+  font-size: 4rem; /* Larger size for $MOTION text */
+}
+
+blockquote {
+  font-size: 5rem; /* Increase size for Got Motion? quote */
+  margin-bottom: 2rem; /* Increase spacing below the quote */
+}
