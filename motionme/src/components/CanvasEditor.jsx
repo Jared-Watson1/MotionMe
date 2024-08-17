@@ -11,6 +11,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
   const [isResizing, setIsResizing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
+  const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
   const [resizeHandle, setResizeHandle] = useState(null);
 
   const handleSize = 10; // Size of the resize handles
@@ -105,7 +106,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
       setResizeHandle(handle.position);
       setDragStart({ x, y });
       setInitialPosition({ x: asset.x, y: asset.y });
-      setInitialPosition({ width: asset.width, height: asset.height });
+      setInitialSize({ width: asset.width, height: asset.height });
     } else {
       // Check if any asset's bounding box is clicked
       const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
@@ -127,14 +128,14 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
     // Update cursor when hovering over a handle
     if (asset) {
-      const handle = getClickedHandle(x, y, asset);
-      if (handle) {
-        canvas.style.cursor = handle.cursor;
-      } else {
-        canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
-      }
+        const handle = getClickedHandle(x, y, asset);
+        if (handle) {
+            canvas.style.cursor = handle.cursor;
+        } else {
+            canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
+        }
     } else {
-      canvas.style.cursor = 'default';
+        canvas.style.cursor = 'default';
     }
 
     if (selectedAssetIndex === null) return;
@@ -142,48 +143,52 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const dx = x - dragStart.x;
     const dy = y - dragStart.y;
 
+    const scalingFactor = 1.0;  // This controls the speed of scaling. Lower value = slower scaling
+
     if (isDragging) {
-      setAssets((prevAssets) => {
-        const updatedAssets = [...prevAssets];
-        const asset = updatedAssets[selectedAssetIndex];
-        asset.x = initialPosition.x + dx;
-        asset.y = initialPosition.y + dy;
-        return updatedAssets;
-      });
+        setAssets((prevAssets) => {
+            const updatedAssets = [...prevAssets];
+            const asset = updatedAssets[selectedAssetIndex];
+            asset.x = initialPosition.x + dx;
+            asset.y = initialPosition.y + dy;
+            return updatedAssets;
+        });
     } else if (isResizing) {
-      setAssets((prevAssets) => {
-        const updatedAssets = [...prevAssets];
-        const asset = updatedAssets[selectedAssetIndex];
+        setAssets((prevAssets) => {
+            const updatedAssets = [...prevAssets];
+            const asset = updatedAssets[selectedAssetIndex];
 
-        switch (resizeHandle) {
-          case 'top-left':
-            asset.x += dx;
-            asset.y += dy;
-            asset.width -= dx;
-            asset.height -= dy;
-            break;
-          case 'top-right':
-            asset.y += dy;
-            asset.width += dx;
-            asset.height -= dy;
-            break;
-          case 'bottom-left':
-            asset.x += dx;
-            asset.width -= dx;
-            asset.height += dy;
-            break;
-          case 'bottom-right':
-            asset.width += dx;
-            asset.height += dy;
-            break;
-          default:
-            break;
-        }
+            let newWidth, newHeight;
 
-        return updatedAssets;
-      });
+            if (event.shiftKey) {
+                // Maintain aspect ratio when Shift key is held
+                const aspectRatio = initialSize.width / initialSize.height;
+                const delta = Math.max(dx, dy) * scalingFactor;
+                newWidth = initialSize.width + delta;
+                newHeight = newWidth / aspectRatio;
+            } else {
+                // Allow freeform scaling
+                newWidth = initialSize.width + dx * scalingFactor;
+                newHeight = initialSize.height + dy * scalingFactor;
+            }
+
+            if (newWidth > 0 && newHeight > 0) {
+                if (resizeHandle.includes('left')) {
+                    asset.x = initialPosition.x + initialSize.width - newWidth;
+                }
+                if (resizeHandle.includes('top')) {
+                    asset.y = initialPosition.y + initialSize.height - newHeight;
+                }
+                asset.width = newWidth;
+                asset.height = newHeight;
+            }
+
+            return updatedAssets;
+        });
     }
-  };
+};
+
+
 
   const handleMouseUp = () => {
     setIsDragging(false);
