@@ -40,3 +40,20 @@
 .read-the-docs {
   color: #888;
 }
+
+@font-face {
+  font-family: "Got Milk";
+  src: url("./assets/fonts/GotMilk-Font.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000000; /* Set background to black */
+  color: #ffffff; /* Set text color to white by default */
+  height: 100%;
+  font-family: "Got Milk", sans-serif;
+}

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import DragAndDrop from './components/DragAndDrop';
-import FileInput from './components/FileInput';
 import CameraInput from './components/CameraInput';
 import CanvasEditor from './components/CanvasEditor';
 import AssetList from './components/AssetList';
+import logo from './assets/logo.png';
+import './App.css'; 
+
+
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,32 +33,36 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen bg-black text-white" style={{ fontFamily: "'Got Milk', sans-serif" }}>
+      <header className="p-4 bg-black flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <img src={logo} alt="Logo" className="h-10" />
+          <h1 className="text-2xl font-bold">#MOTION</h1>
+        </div>
+      </header>
+
       {editing ? (
         <div className="flex h-full">
-          {/* Left side: Canvas Editor */}
           <div className="w-2/3 p-4">
-            <button 
-              className="text-white mb-2 bg-blue-600 p-2 rounded-lg"
+            <button
+              className="text-black mb-2 bg-white p-2 rounded-lg hover:bg-gray-800 hover:text-white transition duration-300"
               onClick={handleBack}
             >
               ← Back
             </button>
-            <CanvasEditor 
-              selectedFile={selectedFile} 
-              onDownload={handleDownload} 
-            />
+            <CanvasEditor selectedFile={selectedFile} onDownload={handleDownload} />
           </div>
-
-          {/* Right side: Image Assets */}
-          <div className="w-1/3 p-4">
+          <div className="w-1/3 p-4 bg-black">
             <AssetList />
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-screen">
+        <div className="flex flex-col items-center justify-center h-screen bg-black">
+          <h2 className="text-3xl font-bold mb-4">#MOTION</h2>
+          <blockquote className="text-xl italic font-semibold text-center text-white">
+            <p>Got Motion?</p>
+          </blockquote>
           <DragAndDrop onFileChange={handleFileChange} />
-          <FileInput onFileChange={handleFileChange} />
           <CameraInput onCapture={handleFileChange} />
         </div>
       )}
