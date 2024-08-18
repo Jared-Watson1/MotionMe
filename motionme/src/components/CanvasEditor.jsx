@@ -9,12 +9,16 @@ function CanvasEditor({ selectedFile, onDownload }) {
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
   const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
+  const [initialRotation, setInitialRotation] = useState(0);
   const [resizeHandle, setResizeHandle] = useState(null);
+  const [setRotation] = useState(0);
 
   const handleSize = 10; // Size of the resize handles
+  const rotateHandleDistance = 30; // Distance of rotate handle from top of the asset
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,7 +59,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
     setAssets((prevAssets) => [
       ...prevAssets,
-      { src: assetSrc, x, y, width: 100, height: 100 }
+      { src: assetSrc, x, y, width: 100, height: 100, rotation: 0 }
     ]);
   };
 
@@ -70,12 +74,27 @@ function CanvasEditor({ selectedFile, onDownload }) {
   };
 
   const isInsideBox = (mouseX, mouseY, asset) => {
+    const { x, y, width, height } = getTransformedBoundingBox(asset);
     return (
-      mouseX >= asset.x &&
-      mouseX <= asset.x + asset.width &&
-      mouseY >= asset.y &&
-      mouseY <= asset.y + asset.height
+      mouseX >= x &&
+      mouseX <= x + width &&
+      mouseY >= y &&
+      mouseY <= y + height
     );
+  };
+
+  const getTransformedBoundingBox = (asset) => {
+    const { x, y, width, height, rotation } = asset;
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+
+    return {
+      x: centerX - width / 2,
+      y: centerY - height / 2,
+      width,
+      height,
+      rotation
+    };
   };
 
   const getClickedHandle = (mouseX, mouseY, asset) => {
@@ -95,27 +114,44 @@ function CanvasEditor({ selectedFile, onDownload }) {
     );
   };
 
+  const isRotateHandleClicked = (mouseX, mouseY, asset) => {
+    const centerX = asset.x + asset.width / 2;
+    const handleX = centerX;
+    const handleY = asset.y - rotateHandleDistance;
+
+    const distance = Math.sqrt((mouseX - handleX) ** 2 + (mouseY - handleY) ** 2);
+    return distance <= handleSize / 2;
+  };
+
   const handleMouseDownToDragOrResize = (event) => {
     const { x, y } = getMousePosition(event);
 
     const asset = assets[selectedAssetIndex];
-    const handle = asset ? getClickedHandle(x, y, asset) : null;
 
-    if (handle) {
-      setIsResizing(true);
-      setResizeHandle(handle.position);
+    if (asset && isRotateHandleClicked(x, y, asset)) {
+      setIsRotating(true);
+      setInitialRotation(asset.rotation);
       setDragStart({ x, y });
-      setInitialPosition({ x: asset.x, y: asset.y });
-      setInitialSize({ width: asset.width, height: asset.height });
     } else {
-      const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
-      if (clickedAssetIndex !== -1) {
-        setSelectedAssetIndex(clickedAssetIndex);
-        setIsDragging(true);
+      const handle = asset ? getClickedHandle(x, y, asset) : null;
+
+      if (handle) {
+        setIsResizing(true);
+        setResizeHandle(handle.position);
         setDragStart({ x, y });
-        setInitialPosition({ x: assets[clickedAssetIndex].x, y: assets[clickedAssetIndex].y });
+        setInitialPosition({ x: asset.x, y: asset.y });
+        setInitialSize({ width: asset.width, height: asset.height });
       } else {
-        setSelectedAssetIndex(null);
+        const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
+        if (clickedAssetIndex !== -1) {
+          setSelectedAssetIndex(clickedAssetIndex);
+          setIsDragging(true);
+          setDragStart({ x, y });
+          setInitialPosition({ x: assets[clickedAssetIndex].x, y: assets[clickedAssetIndex].y });
+          setRotation(assets[clickedAssetIndex].rotation);
+        } else {
+          setSelectedAssetIndex(null);
+        }
       }
     }
   };
@@ -126,11 +162,15 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const asset = assets[selectedAssetIndex];
 
     if (asset) {
-      const handle = getClickedHandle(x, y, asset);
-      if (handle) {
-        canvas.style.cursor = handle.cursor;
+      if (isRotateHandleClicked(x, y, asset)) {
+        canvas.style.cursor = 'crosshair';
       } else {
-        canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
+        const handle = getClickedHandle(x, y, asset);
+        if (handle) {
+          canvas.style.cursor = handle.cursor;
+        } else {
+          canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
+        }
       }
     } else {
       canvas.style.cursor = 'default';
@@ -191,12 +231,26 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
         return updatedAssets;
       });
+    } else if (isRotating) {
+      const centerX = asset.x + asset.width / 2;
+      const centerY = asset.y + asset.height / 2;
+      const angle = Math.atan2(y - centerY, x - centerX);
+      const initialAngle = Math.atan2(dragStart.y - centerY, dragStart.x - centerX);
+      const deltaAngle = angle - initialAngle;
+
+      setAssets((prevAssets) => {
+        const updatedAssets = [...prevAssets];
+        const asset = updatedAssets[selectedAssetIndex];
+        asset.rotation = initialRotation + deltaAngle * (180 / Math.PI);
+        return updatedAssets;
+      });
     }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
     setIsResizing(false);
+    setIsRotating(false);
     setResizeHandle(null);
   };
 
@@ -227,18 +281,24 @@ function CanvasEditor({ selectedFile, onDownload }) {
       const img = new Image();
       img.src = asset.src;
       img.onload = () => {
-        ctx.drawImage(img, asset.x, asset.y, asset.width, asset.height);
+        const centerX = asset.x + asset.width / 2;
+        const centerY = asset.y + asset.height / 2;
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate((asset.rotation * Math.PI) / 180);
+        ctx.drawImage(img, -asset.width / 2, -asset.height / 2, asset.width, asset.height);
 
         if (index === selectedAssetIndex) {
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 2;
-          ctx.strokeRect(asset.x, asset.y, asset.width, asset.height);
+          ctx.strokeRect(-asset.width / 2, -asset.height / 2, asset.width, asset.height);
 
           const handles = [
-            { x: asset.x, y: asset.y },
-            { x: asset.x + asset.width, y: asset.y },
-            { x: asset.x, y: asset.y + asset.height },
-            { x: asset.x + asset.width, y: asset.y + asset.height },
+            { x: -asset.width / 2, y: -asset.height / 2 },
+            { x: asset.width / 2, y: -asset.height / 2 },
+            { x: -asset.width / 2, y: asset.height / 2 },
+            { x: asset.width / 2, y: asset.height / 2 },
           ];
 
           handles.forEach((handle) => {
@@ -248,7 +308,17 @@ function CanvasEditor({ selectedFile, onDownload }) {
             ctx.fillRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
             ctx.strokeRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
           });
+
+          // Draw rotation handle
+          ctx.beginPath();
+          ctx.arc(0, -asset.height / 2 - rotateHandleDistance, handleSize / 2, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.strokeStyle = '#000000';
+          ctx.stroke();
         }
+
+        ctx.restore();
       };
     });
   };
