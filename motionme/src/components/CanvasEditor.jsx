@@ -30,7 +30,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
       const aspectRatio = img.width / img.height;
       const screenWidth = window.innerWidth;
       const maxWidth =
-        screenWidth < 768 ? screenWidth * 0.9 : screenWidth * 0.6; // Scale down on smaller screens
+        screenWidth < 768 ? screenWidth * 0.9 : screenWidth * 0.6;
       const maxHeight = window.innerHeight * 0.7;
 
       let width, height;
