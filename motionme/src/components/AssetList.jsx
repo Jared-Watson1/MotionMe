@@ -1,6 +1,6 @@
-import AssetItem from './AssetItem';
-import logo from '../assets/logo.png';
-import glasses from '../assets/sunglasses.png';
+import AssetItem from "./AssetItem";
+import logo from "../assets/logo.png";
+import glasses from "../assets/sunglasses.png";
 
 function AssetList() {
   const assets = [logo, glasses];

@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
-import { FiCamera } from 'react-icons/fi';
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
+import { FiCamera } from "react-icons/fi";
 
 function CameraInput({ onCapture }) {
   const [videoStream, setVideoStream] = useState(null);
@@ -10,27 +10,27 @@ function CameraInput({ onCapture }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setVideoStream(stream);
-      const video = document.createElement('video');
+      const video = document.createElement("video");
       video.srcObject = stream;
       video.play();
-      video.style.position = 'absolute';
-      video.style.top = '50%';
-      video.style.left = '50%';
-      video.style.transform = 'translate(-50%, -50%)';
-      video.style.zIndex = '999';
+      video.style.position = "absolute";
+      video.style.top = "50%";
+      video.style.left = "50%";
+      video.style.transform = "translate(-50%, -50%)";
+      video.style.zIndex = "999";
       document.body.appendChild(video);
       setVideoElement(video);
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      console.error("Error accessing camera:", error);
     }
   };
 
   const capturePhoto = () => {
     if (videoElement) {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = videoElement.videoWidth;
       canvas.height = videoElement.videoHeight;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         const file = new File([blob], "photo.png", { type: "image/png" });
@@ -38,7 +38,7 @@ function CameraInput({ onCapture }) {
       });
 
       // Stop the video stream and clean up
-      videoStream.getTracks().forEach(track => track.stop());
+      videoStream.getTracks().forEach((track) => track.stop());
       document.body.removeChild(videoElement);
       setVideoStream(null);
       setVideoElement(null);
@@ -48,7 +48,7 @@ function CameraInput({ onCapture }) {
   useEffect(() => {
     return () => {
       if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
+        videoStream.getTracks().forEach((track) => track.stop());
       }
       if (videoElement) {
         document.body.removeChild(videoElement);

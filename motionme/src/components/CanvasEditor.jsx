@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { FiDownload } from 'react-icons/fi';
+import { useRef, useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { FiDownload } from "react-icons/fi";
 
 function CanvasEditor({ selectedFile, onDownload }) {
   const canvasRef = useRef(null);
@@ -22,14 +22,15 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const img = new Image();
 
     img.src = URL.createObjectURL(selectedFile);
     img.onload = () => {
       const aspectRatio = img.width / img.height;
       const screenWidth = window.innerWidth;
-      const maxWidth = screenWidth < 768 ? screenWidth * 0.9 : screenWidth * 0.6; // Scale down on smaller screens
+      const maxWidth =
+        screenWidth < 768 ? screenWidth * 0.9 : screenWidth * 0.6; // Scale down on smaller screens
       const maxHeight = window.innerHeight * 0.7;
 
       let width, height;
@@ -51,7 +52,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
   const handleDrop = (event) => {
     event.preventDefault();
-    const assetSrc = event.dataTransfer.getData('asset');
+    const assetSrc = event.dataTransfer.getData("asset");
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -59,7 +60,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
     setAssets((prevAssets) => [
       ...prevAssets,
-      { src: assetSrc, x, y, width: 100, height: 100, rotation: 0 }
+      { src: assetSrc, x, y, width: 100, height: 100, rotation: 0 },
     ]);
   };
 
@@ -76,10 +77,7 @@ function CanvasEditor({ selectedFile, onDownload }) {
   const isInsideBox = (mouseX, mouseY, asset) => {
     const { x, y, width, height } = getTransformedBoundingBox(asset);
     return (
-      mouseX >= x &&
-      mouseX <= x + width &&
-      mouseY >= y &&
-      mouseY <= y + height
+      mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
     );
   };
 
@@ -93,16 +91,31 @@ function CanvasEditor({ selectedFile, onDownload }) {
       y: centerY - height / 2,
       width,
       height,
-      rotation
+      rotation,
     };
   };
 
   const getClickedHandle = (mouseX, mouseY, asset) => {
     const handles = [
-      { position: 'top-left', x: asset.x, y: asset.y, cursor: 'nwse-resize' },
-      { position: 'top-right', x: asset.x + asset.width, y: asset.y, cursor: 'nesw-resize' },
-      { position: 'bottom-left', x: asset.x, y: asset.y + asset.height, cursor: 'nesw-resize' },
-      { position: 'bottom-right', x: asset.x + asset.width, y: asset.y + asset.height, cursor: 'nwse-resize' },
+      { position: "top-left", x: asset.x, y: asset.y, cursor: "nwse-resize" },
+      {
+        position: "top-right",
+        x: asset.x + asset.width,
+        y: asset.y,
+        cursor: "nesw-resize",
+      },
+      {
+        position: "bottom-left",
+        x: asset.x,
+        y: asset.y + asset.height,
+        cursor: "nesw-resize",
+      },
+      {
+        position: "bottom-right",
+        x: asset.x + asset.width,
+        y: asset.y + asset.height,
+        cursor: "nwse-resize",
+      },
     ];
 
     return handles.find(
@@ -119,7 +132,9 @@ function CanvasEditor({ selectedFile, onDownload }) {
     const handleX = centerX;
     const handleY = asset.y - rotateHandleDistance;
 
-    const distance = Math.sqrt((mouseX - handleX) ** 2 + (mouseY - handleY) ** 2);
+    const distance = Math.sqrt(
+      (mouseX - handleX) ** 2 + (mouseY - handleY) ** 2
+    );
     return distance <= handleSize / 2;
   };
 
@@ -142,12 +157,17 @@ function CanvasEditor({ selectedFile, onDownload }) {
         setInitialPosition({ x: asset.x, y: asset.y });
         setInitialSize({ width: asset.width, height: asset.height });
       } else {
-        const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
+        const clickedAssetIndex = assets.findIndex((asset) =>
+          isInsideBox(x, y, asset)
+        );
         if (clickedAssetIndex !== -1) {
           setSelectedAssetIndex(clickedAssetIndex);
           setIsDragging(true);
           setDragStart({ x, y });
-          setInitialPosition({ x: assets[clickedAssetIndex].x, y: assets[clickedAssetIndex].y });
+          setInitialPosition({
+            x: assets[clickedAssetIndex].x,
+            y: assets[clickedAssetIndex].y,
+          });
           setRotation(assets[clickedAssetIndex].rotation);
         } else {
           setSelectedAssetIndex(null);
@@ -163,17 +183,17 @@ function CanvasEditor({ selectedFile, onDownload }) {
 
     if (asset) {
       if (isRotateHandleClicked(x, y, asset)) {
-        canvas.style.cursor = 'crosshair';
+        canvas.style.cursor = "crosshair";
       } else {
         const handle = getClickedHandle(x, y, asset);
         if (handle) {
           canvas.style.cursor = handle.cursor;
         } else {
-          canvas.style.cursor = isInsideBox(x, y, asset) ? 'move' : 'default';
+          canvas.style.cursor = isInsideBox(x, y, asset) ? "move" : "default";
         }
       }
     } else {
-      canvas.style.cursor = 'default';
+      canvas.style.cursor = "default";
     }
 
     if (selectedAssetIndex === null) return;
@@ -199,16 +219,16 @@ function CanvasEditor({ selectedFile, onDownload }) {
         let newX = initialPosition.x;
         let newY = initialPosition.y;
 
-        if (resizeHandle.includes('right')) {
+        if (resizeHandle.includes("right")) {
           newWidth = initialSize.width + dx;
-        } else if (resizeHandle.includes('left')) {
+        } else if (resizeHandle.includes("left")) {
           newWidth = initialSize.width - dx;
           newX = initialPosition.x + dx;
         }
 
-        if (resizeHandle.includes('bottom')) {
+        if (resizeHandle.includes("bottom")) {
           newHeight = initialSize.height + dy;
-        } else if (resizeHandle.includes('top')) {
+        } else if (resizeHandle.includes("top")) {
           newHeight = initialSize.height - dy;
           newY = initialPosition.y + dy;
         }
@@ -235,7 +255,10 @@ function CanvasEditor({ selectedFile, onDownload }) {
       const centerX = asset.x + asset.width / 2;
       const centerY = asset.y + asset.height / 2;
       const angle = Math.atan2(y - centerY, x - centerX);
-      const initialAngle = Math.atan2(dragStart.y - centerY, dragStart.x - centerX);
+      const initialAngle = Math.atan2(
+        dragStart.y - centerY,
+        dragStart.x - centerX
+      );
       const deltaAngle = angle - initialAngle;
 
       setAssets((prevAssets) => {
@@ -254,82 +277,122 @@ function CanvasEditor({ selectedFile, onDownload }) {
     setResizeHandle(null);
   };
 
-  const handleKeyDown = (event) => {
-    if (selectedAssetIndex !== null && (event.key === 'Delete' || event.key === 'Backspace')) {
-      setAssets((prevAssets) => prevAssets.filter((_, index) => index !== selectedAssetIndex));
-      setSelectedAssetIndex(null);
-    }
-  };
-
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
+    const handleKeyDown = (event) => {
+      if (
+        selectedAssetIndex !== null &&
+        (event.key === "Delete" || event.key === "Backspace")
+      ) {
+        setAssets((prevAssets) =>
+          prevAssets.filter((_, index) => index !== selectedAssetIndex)
+        );
+        setSelectedAssetIndex(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [selectedAssetIndex]);
 
-  const drawCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (imageRef.current) {
-      ctx.drawImage(imageRef.current.img, 0, 0, imageRef.current.width, imageRef.current.height);
-    }
-
-    assets.forEach((asset, index) => {
-      const img = new Image();
-      img.src = asset.src;
-      img.onload = () => {
-        const centerX = asset.x + asset.width / 2;
-        const centerY = asset.y + asset.height / 2;
-
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate((asset.rotation * Math.PI) / 180);
-        ctx.drawImage(img, -asset.width / 2, -asset.height / 2, asset.width, asset.height);
-
-        if (index === selectedAssetIndex) {
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(-asset.width / 2, -asset.height / 2, asset.width, asset.height);
-
-          const handles = [
-            { x: -asset.width / 2, y: -asset.height / 2 },
-            { x: asset.width / 2, y: -asset.height / 2 },
-            { x: -asset.width / 2, y: asset.height / 2 },
-            { x: asset.width / 2, y: asset.height / 2 },
-          ];
-
-          handles.forEach((handle) => {
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2;
-            ctx.fillRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
-            ctx.strokeRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
-          });
-
-          // Draw rotation handle
-          ctx.beginPath();
-          ctx.arc(0, -asset.height / 2 - rotateHandleDistance, handleSize / 2, 0, 2 * Math.PI);
-          ctx.fillStyle = '#ffffff';
-          ctx.fill();
-          ctx.strokeStyle = '#000000';
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      };
-    });
-  };
-
   useEffect(() => {
+    const drawCanvas = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (imageRef.current) {
+        ctx.drawImage(
+          imageRef.current.img,
+          0,
+          0,
+          imageRef.current.width,
+          imageRef.current.height
+        );
+      }
+
+      assets.forEach((asset, index) => {
+        const img = new Image();
+        img.src = asset.src;
+        img.onload = () => {
+          const centerX = asset.x + asset.width / 2;
+          const centerY = asset.y + asset.height / 2;
+
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate((asset.rotation * Math.PI) / 180);
+          ctx.drawImage(
+            img,
+            -asset.width / 2,
+            -asset.height / 2,
+            asset.width,
+            asset.height
+          );
+
+          if (index === selectedAssetIndex) {
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+              -asset.width / 2,
+              -asset.height / 2,
+              asset.width,
+              asset.height
+            );
+
+            const handles = [
+              { x: -asset.width / 2, y: -asset.height / 2 },
+              { x: asset.width / 2, y: -asset.height / 2 },
+              { x: -asset.width / 2, y: asset.height / 2 },
+              { x: asset.width / 2, y: asset.height / 2 },
+            ];
+
+            handles.forEach((handle) => {
+              ctx.fillStyle = "#ffffff";
+              ctx.strokeStyle = "#000000";
+              ctx.lineWidth = 2;
+              ctx.fillRect(
+                handle.x - handleSize / 2,
+                handle.y - handleSize / 2,
+                handleSize,
+                handleSize
+              );
+              ctx.strokeRect(
+                handle.x - handleSize / 2,
+                handle.y - handleSize / 2,
+                handleSize,
+                handleSize
+              );
+            });
+
+            // Draw rotation handle
+            ctx.beginPath();
+            ctx.arc(
+              0,
+              -asset.height / 2 - rotateHandleDistance,
+              handleSize / 2,
+              0,
+              2 * Math.PI
+            );
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.strokeStyle = "#000000";
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        };
+      });
+    };
+
     drawCanvas();
   }, [assets, selectedAssetIndex]);
 
   const handleCanvasClick = (event) => {
     const { x, y } = getMousePosition(event);
-    const clickedAssetIndex = assets.findIndex((asset) => isInsideBox(x, y, asset));
+    const clickedAssetIndex = assets.findIndex((asset) =>
+      isInsideBox(x, y, asset)
+    );
 
     if (clickedAssetIndex === -1) {
       setSelectedAssetIndex(null);

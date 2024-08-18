@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 function AssetItem({ src }) {
   const handleDragStart = (event) => {
-    event.dataTransfer.setData('asset', src);
+    event.dataTransfer.setData("asset", src);
   };
 
   return (
-    <div 
+    <div
       className="w-full h-32 mb-4 p-2 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
       draggable
       onDragStart={handleDragStart}
