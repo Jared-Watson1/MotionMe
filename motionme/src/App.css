@@ -5,34 +5,6 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
 .card {
   padding: 2em;
 }
@@ -52,10 +24,38 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: #000000; /* Set background to black */
-  color: #ffffff; /* Set text color to white by default */
   height: 100%;
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: "Got Milk", sans-serif;
+}
+
+/* Light Mode Styles */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+/* Light Mode */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+/* Dark Mode */
+.dark {
+  --background-color: #000000;
+  --text-color: #ffffff;
+}
+
+.container {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 h1,

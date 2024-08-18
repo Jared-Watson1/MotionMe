@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { FiCamera } from "react-icons/fi";
 
-function CameraInput({ onCapture }) {
+function CameraInput({ onCapture, isDarkMode }) {
   const [videoStream, setVideoStream] = useState(null);
   const [videoElement, setVideoElement] = useState(null);
 
@@ -60,7 +60,11 @@ function CameraInput({ onCapture }) {
     <div className="mt-6 flex flex-col items-center">
       {!videoStream && (
         <button
-          className="flex items-center justify-center px-4 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-800 hover:text-white transition duration-300"
+          className={`flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${
+            isDarkMode
+              ? "text-black bg-white hover:bg-gray-800 hover:text-white"
+              : "text-white bg-black hover:bg-gray-200 hover:text-black"
+          }`}
           onClick={startCamera}
           style={{ fontFamily: "'Got Milk', sans-serif" }}
         >
@@ -71,7 +75,11 @@ function CameraInput({ onCapture }) {
 
       {videoStream && (
         <button
-          className="mt-4 flex items-center justify-center px-4 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-800 hover:text-white transition duration-300"
+          className={`mt-4 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${
+            isDarkMode
+              ? "text-black bg-white hover:bg-gray-800 hover:text-white"
+              : "text-white bg-black hover:bg-gray-200 hover:text-black"
+          }`}
           onClick={capturePhoto}
           style={{ fontFamily: "'Got Milk', sans-serif" }}
         >
@@ -84,6 +92,7 @@ function CameraInput({ onCapture }) {
 
 CameraInput.propTypes = {
   onCapture: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
 };
 
 export default CameraInput;
