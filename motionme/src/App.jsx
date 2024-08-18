@@ -5,6 +5,7 @@ import CanvasEditor from "./components/CanvasEditor";
 import AssetList from "./components/AssetList";
 import Header from "./components/Header";
 import GotMotionText from "./components/GotMotionText";
+import DownloadButton from "./components/DownloadButton"; // Import the new component
 import "./App.css";
 
 function App() {
@@ -37,14 +38,6 @@ function App() {
     setEditing(false);
   };
 
-  const handleDownload = () => {
-    const canvas = document.querySelector("canvas");
-    const link = document.createElement("a");
-    link.download = "edited-image.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  };
-
   return (
     <div className={`min-h-screen flex flex-col container`}>
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
@@ -61,10 +54,9 @@ function App() {
             >
               ← Back
             </button>
-            <CanvasEditor
-              selectedFile={selectedFile}
-              onDownload={handleDownload}
-            />
+            <CanvasEditor selectedFile={selectedFile} />
+            <DownloadButton isDarkMode={isDarkMode} />{" "}
+            {/* Integrate the DownloadButton */}
           </div>
           <div
             className={`md:w-1/3 w-full md:pl-4 md:pr-0 p-4 ${

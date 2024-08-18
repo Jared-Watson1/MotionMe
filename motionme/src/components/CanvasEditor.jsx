@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { FiDownload } from "react-icons/fi";
 
-function CanvasEditor({ selectedFile, onDownload }) {
+function CanvasEditor({ selectedFile }) {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
   const [assets, setAssets] = useState([]);
@@ -399,11 +398,6 @@ function CanvasEditor({ selectedFile, onDownload }) {
     }
   };
 
-  const handleDownloadClick = () => {
-    setSelectedAssetIndex(null);
-    setTimeout(onDownload, 100);
-  };
-
   return (
     <div
       className="relative flex flex-col items-center justify-center w-full h-full"
@@ -418,12 +412,6 @@ function CanvasEditor({ selectedFile, onDownload }) {
         onMouseDown={handleMouseDownToDragOrResize}
         onClick={handleCanvasClick}
       />
-      <button
-        className="mt-4 bg-white text-black p-3 rounded-full shadow hover:bg-[#1a1a1a] focus:outline-none md:ml-4 self-start"
-        onClick={handleDownloadClick}
-      >
-        <FiDownload size={24} />
-      </button>
     </div>
   );
 }
