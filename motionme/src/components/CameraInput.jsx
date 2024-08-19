@@ -1,60 +1,58 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FiCamera } from "react-icons/fi";
 
 function CameraInput({ onCapture, isDarkMode }) {
   const [videoStream, setVideoStream] = useState(null);
-  const [videoElement, setVideoElement] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }, // Use the rear camera if available
+      });
       setVideoStream(stream);
-      const video = document.createElement("video");
+      const video = videoRef.current;
       video.srcObject = stream;
       video.play();
-      video.style.position = "absolute";
-      video.style.top = "50%";
-      video.style.left = "50%";
-      video.style.transform = "translate(-50%, -50%)";
-      video.style.zIndex = "999";
-      document.body.appendChild(video);
-      setVideoElement(video);
     } catch (error) {
       console.error("Error accessing camera:", error);
     }
   };
 
   const capturePhoto = () => {
-    if (videoElement) {
-      const canvas = document.createElement("canvas");
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert the canvas to a Blob and then to a File object
       canvas.toBlob((blob) => {
-        const file = new File([blob], "photo.png", { type: "image/png" });
-        onCapture(file);
+        if (blob) {
+          const file = new File([blob], "photo.png", { type: "image/png" });
+          onCapture(file);
+        }
       });
 
       // Stop the video stream and clean up
       videoStream.getTracks().forEach((track) => track.stop());
-      document.body.removeChild(videoElement);
       setVideoStream(null);
-      setVideoElement(null);
     }
   };
 
   useEffect(() => {
     return () => {
+      // Cleanup when the component unmounts
       if (videoStream) {
         videoStream.getTracks().forEach((track) => track.stop());
       }
-      if (videoElement) {
-        document.body.removeChild(videoElement);
-      }
     };
-  }, [videoStream, videoElement]);
+  }, [videoStream]);
 
   return (
     <div className="mt-6 flex flex-col items-center">
@@ -74,17 +72,26 @@ function CameraInput({ onCapture, isDarkMode }) {
       )}
 
       {videoStream && (
-        <button
-          className={`mt-4 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${
-            isDarkMode
-              ? "text-black bg-white hover:bg-gray-800 hover:text-white"
-              : "text-white bg-black hover:bg-gray-200 hover:text-black"
-          }`}
-          onClick={capturePhoto}
-          style={{ fontFamily: "'Got Milk', sans-serif" }}
-        >
-          Capture Photo
-        </button>
+        <>
+          <video
+            ref={videoRef}
+            className="rounded-lg"
+            style={{ maxWidth: "100%", height: "auto" }}
+            playsInline
+          />
+          <canvas ref={canvasRef} className="hidden" />
+          <button
+            className={`mt-4 flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition duration-300 ${
+              isDarkMode
+                ? "text-black bg-white hover:bg-gray-800 hover:text-white"
+                : "text-white bg-black hover:bg-gray-200 hover:text-black"
+            }`}
+            onClick={capturePhoto}
+            style={{ fontFamily: "'Got Milk', sans-serif" }}
+          >
+            Capture Photo
+          </button>
+        </>
       )}
     </div>
   );

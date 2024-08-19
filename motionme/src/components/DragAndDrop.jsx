@@ -55,7 +55,7 @@ function DragAndDrop({ onFileChange, isDarkMode }) {
             }`}
             onClick={handleButtonClick}
           >
-            + Upload an image
+            Upload an image
           </button>
           <p className="text-sm">or drag & drop here</p>
         </div>

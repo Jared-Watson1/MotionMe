@@ -81,7 +81,7 @@ function Header({ isDarkMode, setIsDarkMode }) {
           <div>
             <button
               type="button"
-              className={`inline-flex justify-center gap-x-1.5 rounded-md px-3 py-2 text-lg font-semibold tracking-wider ${
+              className={`inline-flex justify-center gap-x-1.5 rounded-md px-3 py-2 text-lg font-semibold tracking-wider items-center ${
                 isDarkMode
                   ? "bg-black text-white hover:bg-gray-700"
                   : "bg-white text-black hover:bg-gray-200"
