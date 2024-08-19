@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import DragAndDrop from "./components/DragAndDrop";
-import CameraInput from "./components/CameraInput";
 import CanvasEditor from "./components/CanvasEditor";
 import AssetList from "./components/AssetList";
 import Header from "./components/Header";
 import GotMotionText from "./components/GotMotionText";
 import DownloadButton from "./components/DownloadButton";
+import BuyButton from "./components/BuyButton";
+import ContractInfo from "./components/ContractInfo";
 import "./App.css";
 
 function App() {
@@ -90,7 +91,10 @@ function App() {
             onFileChange={handleFileChange}
             isDarkMode={isDarkMode}
           />
-          <CameraInput onCapture={handleFileChange} isDarkMode={isDarkMode} />
+          <div className="flex space-x-4 mt-10">
+            <BuyButton isDarkMode={isDarkMode} />
+            <ContractInfo isDarkMode={isDarkMode} />
+          </div>
         </div>
       )}
     </div>
