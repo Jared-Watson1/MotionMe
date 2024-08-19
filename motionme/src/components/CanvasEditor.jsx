@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-function CanvasEditor({ selectedFile, onImageLoad }) {
+function CanvasEditor({ selectedFile, onImageLoad, clickedAssetSrc }) {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
   const [assets, setAssets] = useState([]);
@@ -53,6 +53,118 @@ function CanvasEditor({ selectedFile, onImageLoad }) {
       }
     };
   }, [selectedFile, onImageLoad]);
+
+  useEffect(() => {
+    if (clickedAssetSrc) {
+      const canvas = canvasRef.current;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      setAssets((prevAssets) => [
+        ...prevAssets,
+        {
+          src: clickedAssetSrc,
+          x: centerX - 50,
+          y: centerY - 50,
+          width: 100,
+          height: 100,
+          rotation: 0,
+        },
+      ]);
+    }
+  }, [clickedAssetSrc]);
+
+  useEffect(() => {
+    const drawCanvas = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (imageRef.current) {
+        ctx.drawImage(
+          imageRef.current.img,
+          0,
+          0,
+          imageRef.current.width,
+          imageRef.current.height
+        );
+      }
+
+      assets.forEach((asset, index) => {
+        const img = new Image();
+        img.src = asset.src;
+        img.onload = () => {
+          const centerX = asset.x + asset.width / 2;
+          const centerY = asset.y + asset.height / 2;
+
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate((asset.rotation * Math.PI) / 180);
+          ctx.drawImage(
+            img,
+            -asset.width / 2,
+            -asset.height / 2,
+            asset.width,
+            asset.height
+          );
+
+          if (index === selectedAssetIndex) {
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+              -asset.width / 2,
+              -asset.height / 2,
+              asset.width,
+              asset.height
+            );
+
+            const handles = [
+              { x: -asset.width / 2, y: -asset.height / 2 },
+              { x: asset.width / 2, y: -asset.height / 2 },
+              { x: -asset.width / 2, y: asset.height / 2 },
+              { x: asset.width / 2, y: asset.height / 2 },
+            ];
+
+            handles.forEach((handle) => {
+              ctx.fillStyle = "#ffffff";
+              ctx.strokeStyle = "#000000";
+              ctx.lineWidth = 2;
+              ctx.fillRect(
+                handle.x - handleSize / 2,
+                handle.y - handleSize / 2,
+                handleSize,
+                handleSize
+              );
+              ctx.strokeRect(
+                handle.x - handleSize / 2,
+                handle.y - handleSize / 2,
+                handleSize,
+                handleSize
+              );
+            });
+
+            // Draw rotation handle
+            ctx.beginPath();
+            ctx.arc(
+              0,
+              -asset.height / 2 - rotateHandleDistance,
+              handleSize / 2,
+              0,
+              2 * Math.PI
+            );
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.strokeStyle = "#000000";
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        };
+      });
+    };
+
+    drawCanvas();
+  }, [assets, selectedAssetIndex]);
 
   const handleDrop = (event) => {
     event.preventDefault();
@@ -300,98 +412,6 @@ function CanvasEditor({ selectedFile, onImageLoad }) {
     };
   }, [selectedAssetIndex]);
 
-  useEffect(() => {
-    const drawCanvas = () => {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (imageRef.current) {
-        ctx.drawImage(
-          imageRef.current.img,
-          0,
-          0,
-          imageRef.current.width,
-          imageRef.current.height
-        );
-      }
-
-      assets.forEach((asset, index) => {
-        const img = new Image();
-        img.src = asset.src;
-        img.onload = () => {
-          const centerX = asset.x + asset.width / 2;
-          const centerY = asset.y + asset.height / 2;
-
-          ctx.save();
-          ctx.translate(centerX, centerY);
-          ctx.rotate((asset.rotation * Math.PI) / 180);
-          ctx.drawImage(
-            img,
-            -asset.width / 2,
-            -asset.height / 2,
-            asset.width,
-            asset.height
-          );
-
-          if (index === selectedAssetIndex) {
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(
-              -asset.width / 2,
-              -asset.height / 2,
-              asset.width,
-              asset.height
-            );
-
-            const handles = [
-              { x: -asset.width / 2, y: -asset.height / 2 },
-              { x: asset.width / 2, y: -asset.height / 2 },
-              { x: -asset.width / 2, y: asset.height / 2 },
-              { x: asset.width / 2, y: asset.height / 2 },
-            ];
-
-            handles.forEach((handle) => {
-              ctx.fillStyle = "#ffffff";
-              ctx.strokeStyle = "#000000";
-              ctx.lineWidth = 2;
-              ctx.fillRect(
-                handle.x - handleSize / 2,
-                handle.y - handleSize / 2,
-                handleSize,
-                handleSize
-              );
-              ctx.strokeRect(
-                handle.x - handleSize / 2,
-                handle.y - handleSize / 2,
-                handleSize,
-                handleSize
-              );
-            });
-
-            // Draw rotation handle
-            ctx.beginPath();
-            ctx.arc(
-              0,
-              -asset.height / 2 - rotateHandleDistance,
-              handleSize / 2,
-              0,
-              2 * Math.PI
-            );
-            ctx.fillStyle = "#ffffff";
-            ctx.fill();
-            ctx.strokeStyle = "#000000";
-            ctx.stroke();
-          }
-
-          ctx.restore();
-        };
-      });
-    };
-
-    drawCanvas();
-  }, [assets, selectedAssetIndex]);
-
   const handleCanvasClick = (event) => {
     const { x, y } = getMousePosition(event);
     const clickedAssetIndex = assets.findIndex((asset) =>
@@ -423,7 +443,8 @@ function CanvasEditor({ selectedFile, onImageLoad }) {
 
 CanvasEditor.propTypes = {
   selectedFile: PropTypes.object.isRequired,
-  onImageLoad: PropTypes.func.isRequired, // New prop for passing image height
+  onImageLoad: PropTypes.func.isRequired,
+  clickedAssetSrc: PropTypes.string, // New prop for clicked asset source
 };
 
 export default CanvasEditor;

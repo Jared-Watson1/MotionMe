@@ -12,6 +12,7 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [editing, setEditing] = useState(false);
   const [imageHeight, setImageHeight] = useState(0);
+  const [clickedAssetSrc, setClickedAssetSrc] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return (
       window.matchMedia &&
@@ -43,11 +44,8 @@ function App() {
     setImageHeight(height);
   };
 
-  const handleAssetClick = () => {
-    if (selectedFile) {
-      // pass the asset to CanvasEditor
-      // this will add the asset to the canvas
-    }
+  const handleAssetClick = (src) => {
+    setClickedAssetSrc(src); // Set the clicked asset source
   };
 
   return (
@@ -69,6 +67,7 @@ function App() {
             <CanvasEditor
               selectedFile={selectedFile}
               onImageLoad={handleImageLoad} // Pass the image load handler
+              clickedAssetSrc={clickedAssetSrc} // Pass the clicked asset source
             />
             <DownloadButton isDarkMode={isDarkMode} />
           </div>

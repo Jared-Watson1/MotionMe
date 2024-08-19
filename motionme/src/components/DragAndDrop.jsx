@@ -26,7 +26,7 @@ function DragAndDrop({ onFileChange, isDarkMode }) {
 
   return (
     <div
-      className="flex items-center justify-center w-full mb-4 mt-3"
+      className="flex items-center justify-center w-full mb-4 mt-8"
       onDrop={handleFileDrop}
       onDragOver={handleDragOver}
     >
