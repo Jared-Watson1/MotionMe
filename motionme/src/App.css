@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: "Got Milk";
-  src: url("./assets/fonts/GotMilk-Font.ttf?v=1.0") format("truetype");
+  src: url("/assets/fonts/Gotmilk-Font.ttf?v=1.0") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
