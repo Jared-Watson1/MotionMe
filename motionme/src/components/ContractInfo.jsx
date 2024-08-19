@@ -20,24 +20,48 @@ function ContractInfo({ isDarkMode }) {
       }`}
     >
       <h2 className="text-lg font-semibold mb-2">Contract Info</h2>
-      <address
-        className={`relative p-4 rounded-lg border grid grid-cols-2 not-italic leading-loose ${
+      {copied && (
+        <div
+          className={`mt-4 flex items-center p-4 text-sm rounded-lg transition-opacity duration-300 ${
+            isDarkMode
+              ? "bg-gray-800 text-green-400"
+              : "bg-green-50 text-green-800"
+          }`}
+        >
+          <svg
+            className="flex-shrink-0 w-4 h-4 mr-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+          </svg>
+          <span className="font-medium">Copied to clipboard!</span>
+        </div>
+      )}
+      <div
+        className={`relative p-4 rounded-lg border cursor-pointer ${
           isDarkMode
-            ? "bg-black border border-gray-200"
-            : "bg-gray-50 border border-gray-200"
+            ? "bg-black border border-gray-200 text-white"
+            : "bg-gray-50 border border-gray-200 text-black"
         }`}
+        onClick={handleCopyToClipboard} // Make the whole box clickable
       >
-        <div className="space-y-2 leading-loose hidden sm:block">
+        <div className="leading-loose">
           <span>Contract Address</span>
         </div>
         <div
           id="contract-details"
-          className="space-y-2 font-medium leading-loose"
+          className="space-y-2 font-medium leading-loose mt-2"
         >
-          [BUY MOTION] [SPLXXXXXXXXXXXXXXXXXXXXXX]
+          SPLXXXXXXXXXXXXXXXXXXXXXX
         </div>
         <button
-          onClick={handleCopyToClipboard}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering the parent's onClick
+            handleCopyToClipboard();
+          }}
           className={`absolute end-2 top-2 p-2 rounded-lg inline-flex items-center justify-center transition ${
             isDarkMode
               ? "text-gray-400 hover:bg-gray-800"
@@ -46,7 +70,7 @@ function ContractInfo({ isDarkMode }) {
         >
           {copied ? (
             <svg
-              className="w-3.5 h-3.5 text-blue-700 dark:text-blue-500"
+              className="w-3.5 h-3.5 text-black dark:text-white"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 16 12"
@@ -72,7 +96,7 @@ function ContractInfo({ isDarkMode }) {
             </svg>
           )}
         </button>
-      </address>
+      </div>
     </div>
   );
 }
