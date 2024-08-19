@@ -18,7 +18,7 @@ function AssetItem({ name, src, isDarkMode, onClick }) {
     >
       <img src={src} alt={name} className="max-h-28 object-contain" />
       <div
-        className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md font-bold text-sm ${
+        className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md font-bold text-base ${
           isDarkMode
             ? "text-white bg-gray-800 bg-opacity-75"
             : "text-black bg-white bg-opacity-75"
