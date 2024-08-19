@@ -59,6 +59,10 @@ const assets = [
 ];
 
 function AssetList({ isDarkMode, onAssetClick, imageHeight }) {
+  const handleScroll = (event) => {
+    event.stopPropagation(); // Prevent scroll from propagating to parent elements
+  };
+
   return (
     <div className="md:p-4 p-2 w-full">
       <h2
@@ -71,6 +75,7 @@ function AssetList({ isDarkMode, onAssetClick, imageHeight }) {
       <div
         className="overflow-y-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4"
         style={{ height: imageHeight + "px" }} // Set the height dynamically
+        onWheel={handleScroll} // Ensure the scroll is contained within the asset list
       >
         {assets.map((asset, index) => (
           <AssetItem
