@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import Shades from "../assets/motion-me-assets/SHADES.png";
 
 function DragAndDrop({ onFileChange, isDarkMode }) {
   const handleFileDrop = (event) => {
@@ -26,37 +27,44 @@ function DragAndDrop({ onFileChange, isDarkMode }) {
 
   return (
     <div
-      className="flex items-center justify-center w-full mb-4 mt-8"
+      className="flex items-center justify-center w-full mb-6 mt-10"
       onDrop={handleFileDrop}
       onDragOver={handleDragOver}
     >
       <label
         htmlFor="dropzone-file"
-        className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg text-center p-4 cursor-pointer ${
+        className={`flex flex-col items-center justify-between w-full h-96 border-2 border-dashed rounded-xl text-center p-8 cursor-pointer ${
           isDarkMode
             ? "border-white bg-black text-white"
             : "border-black bg-white text-black"
         }`}
         style={{ fontFamily: "'Got Milk', sans-serif" }}
       >
-        <h2 className="text-4xl font-bold mb-2 tracking-wider">
-          STAY IN MOTION
-        </h2>
-        <p className="text-lg mb-4">
-          Add sunglasses and other stickers to any image
-        </p>
+        <div className="flex flex-col items-center">
+          <img src={Shades} alt="Shades" className="h-24" />
+        </div>
 
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+        <div className="flex flex-col items-center">
+          <h2 className="text-4xl font-bold tracking-wider mb-4">
+            STAY IN MOTION
+          </h2>
+          <p className="text-lg mb-4">
+            Add sunglasses and other stickers to any image
+          </p>
+
           <button
-            className={`font-semibold px-4 py-2 rounded-md mb-2 transition duration-300 ${
+            className={`font-semibold px-4 py-2 rounded-md mb-4 transition duration-300 ${
               isDarkMode
                 ? "bg-white text-black hover:bg-gray-800 hover:text-white"
                 : "bg-black text-white hover:bg-gray-200 hover:text-black"
             }`}
             onClick={handleButtonClick}
           >
-            Upload an image
+            + Upload an image
           </button>
+        </div>
+
+        <div className="flex flex-col items-center">
           <p className="text-sm">or drag & drop here</p>
         </div>
 
