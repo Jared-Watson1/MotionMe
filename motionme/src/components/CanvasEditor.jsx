@@ -297,6 +297,8 @@ function CanvasEditor({
   };
 
   const handleMouseDownToDragOrResize = (event) => {
+    event.preventDefault(); // Prevent default behavior like text selection
+
     const { x, y } = getMousePosition(event);
 
     const asset = assets[selectedAssetIndex];
@@ -335,6 +337,8 @@ function CanvasEditor({
   };
 
   const handleTouchStartToDragOrResize = (event) => {
+    event.preventDefault(); // Prevent default behavior like scrolling
+
     const { x, y } = getTouchPosition(event);
 
     const asset = assets[selectedAssetIndex];
@@ -375,6 +379,8 @@ function CanvasEditor({
   const handleMouseMove = useCallback(
     (event) => {
       if (selectedAssetIndex === null) return;
+
+      event.preventDefault(); // Prevent default behavior like text selection
 
       const { x, y } = getMousePosition(event);
       const dx = x - dragStart.x;
@@ -478,6 +484,8 @@ function CanvasEditor({
   const handleTouchMove = useCallback(
     (event) => {
       if (selectedAssetIndex === null) return;
+
+      event.preventDefault(); // Prevent default behavior like scrolling
 
       const { x, y } = getTouchPosition(event);
       const dx = x - dragStart.x;
