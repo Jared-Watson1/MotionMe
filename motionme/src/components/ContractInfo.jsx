@@ -13,19 +13,19 @@ function ContractInfo({ isDarkMode }) {
 
   return (
     <div
-      className={`w-full max-w-md p-5 rounded-lg shadow border ${
+      className={`w-full max-w-md mx-auto mt-6 p-5 rounded-lg shadow ${
         isDarkMode
-          ? "bg-gray-800 border-gray-700 text-white"
-          : "bg-white border-gray-200 text-black"
+          ? "bg-black border border-gray-200 text-white"
+          : "bg-white border border-gray-200 text-black"
       }`}
     >
       <h2 className="text-lg font-semibold mb-2">Contract Info</h2>
       <address
-        className="relative p-4 rounded-lg border grid grid-cols-2 not-italic leading-loose"
-        style={{
-          backgroundColor: isDarkMode ? "gray-700" : "gray-50",
-          borderColor: isDarkMode ? "gray-600" : "gray-200",
-        }}
+        className={`relative p-4 rounded-lg border grid grid-cols-2 not-italic leading-loose ${
+          isDarkMode
+            ? "bg-black border border-gray-200"
+            : "bg-gray-50 border border-gray-200"
+        }`}
       >
         <div className="space-y-2 leading-loose hidden sm:block">
           <span>Contract Address</span>
@@ -72,14 +72,6 @@ function ContractInfo({ isDarkMode }) {
             </svg>
           )}
         </button>
-        <div
-          id="tooltip-contract-details"
-          role="tooltip"
-          className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
-        >
-          {copied ? "Copied!" : "Copy to clipboard"}
-          <div className="tooltip-arrow" data-popper-arrow></div>
-        </div>
       </address>
     </div>
   );

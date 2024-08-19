@@ -5,7 +5,7 @@ import AssetList from "./components/AssetList";
 import Header from "./components/Header";
 import GotMotionText from "./components/GotMotionText";
 import DownloadButton from "./components/DownloadButton";
-import BuyButton from "./components/BuyButton";
+import BuyButton from "./components/BuyButton"; // Import the BuyButton
 import ContractInfo from "./components/ContractInfo";
 import "./App.css";
 
@@ -91,12 +91,11 @@ function App() {
             onFileChange={handleFileChange}
             isDarkMode={isDarkMode}
           />
-          <div className="flex space-x-4 mt-10">
-            <BuyButton isDarkMode={isDarkMode} />
-            <ContractInfo isDarkMode={isDarkMode} />
-          </div>
+          <ContractInfo isDarkMode={isDarkMode} />
         </div>
       )}
+      {/* Place the BuyButton at the bottom left */}
+      <BuyButton isDarkMode={isDarkMode} />
     </div>
   );
 }
