@@ -225,6 +225,13 @@ function CanvasEditor({
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   };
 
+  const getTouchPosition = (event) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const touch = event.touches[0];
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+  };
+
   const isInsideBox = (mouseX, mouseY, asset) => {
     const { x, y, width, height } = getTransformedBoundingBox(asset);
     return (
@@ -291,6 +298,44 @@ function CanvasEditor({
 
   const handleMouseDownToDragOrResize = (event) => {
     const { x, y } = getMousePosition(event);
+
+    const asset = assets[selectedAssetIndex];
+
+    if (asset && isRotateHandleClicked(x, y, asset)) {
+      setIsRotating(true);
+      setInitialRotation(asset.rotation);
+      setDragStart({ x, y });
+    } else {
+      const handle = asset ? getClickedHandle(x, y, asset) : null;
+
+      if (handle) {
+        setIsResizing(true);
+        setResizeHandle(handle.position);
+        setDragStart({ x, y });
+        setInitialPosition({ x: asset.x, y: asset.y });
+        setInitialSize({ width: asset.width, height: asset.height });
+      } else {
+        const clickedAssetIndex = assets.findIndex((asset) =>
+          isInsideBox(x, y, asset)
+        );
+        if (clickedAssetIndex !== -1) {
+          setSelectedAssetIndex(clickedAssetIndex);
+          setIsDraggingAsset(true);
+          setDragStart({ x, y });
+          setInitialPosition({
+            x: assets[clickedAssetIndex].x,
+            y: assets[clickedAssetIndex].y,
+          });
+          setRotation(assets[clickedAssetIndex].rotation);
+        } else {
+          setSelectedAssetIndex(null);
+        }
+      }
+    }
+  };
+
+  const handleTouchStartToDragOrResize = (event) => {
+    const { x, y } = getTouchPosition(event);
 
     const asset = assets[selectedAssetIndex];
 
@@ -406,6 +451,100 @@ function CanvasEditor({
         });
         drawCanvas();
       }
+
+      const asset = assets[selectedAssetIndex];
+      if (asset && getClickedHandle(x, y, asset)) {
+        canvasRef.current.style.cursor = "nwse-resize";
+      } else if (asset && isInsideBox(x, y, asset)) {
+        canvasRef.current.style.cursor = "move";
+      } else {
+        canvasRef.current.style.cursor = "default";
+      }
+    },
+    [
+      selectedAssetIndex,
+      isDraggingAsset,
+      isResizing,
+      isRotating,
+      dragStart,
+      initialPosition,
+      initialSize,
+      initialRotation,
+      resizeHandle,
+      drawCanvas,
+    ]
+  );
+
+  const handleTouchMove = useCallback(
+    (event) => {
+      if (selectedAssetIndex === null) return;
+
+      const { x, y } = getTouchPosition(event);
+      const dx = x - dragStart.x;
+      const dy = y - dragStart.y;
+
+      if (isDraggingAsset) {
+        setAssets((prevAssets) => {
+          const updatedAssets = [...prevAssets];
+          const asset = updatedAssets[selectedAssetIndex];
+          asset.x = initialPosition.x + dx;
+          asset.y = initialPosition.y + dy;
+          return updatedAssets;
+        });
+        drawCanvas();
+      } else if (isResizing) {
+        setAssets((prevAssets) => {
+          const updatedAssets = [...prevAssets];
+          const asset = updatedAssets[selectedAssetIndex];
+
+          let newWidth = initialSize.width;
+          let newHeight = initialSize.height;
+          let newX = initialPosition.x;
+          let newY = initialPosition.y;
+
+          if (resizeHandle.includes("right")) {
+            newWidth = initialSize.width + dx;
+          } else if (resizeHandle.includes("left")) {
+            newWidth = initialSize.width - dx;
+            newX = initialPosition.x + dx;
+          }
+
+          if (resizeHandle.includes("bottom")) {
+            newHeight = initialSize.height + dy;
+          } else if (resizeHandle.includes("top")) {
+            newHeight = initialSize.height - dy;
+            newY = initialPosition.y + dy;
+          }
+
+          if (newWidth > 0 && newHeight > 0) {
+            asset.x = newX;
+            asset.y = newY;
+            asset.width = newWidth;
+            asset.height = newHeight;
+          }
+
+          return updatedAssets;
+        });
+        drawCanvas();
+      } else if (isRotating) {
+        const asset = assets[selectedAssetIndex];
+        const centerX = asset.x + asset.width / 2;
+        const centerY = asset.y + asset.height / 2;
+        const angle = Math.atan2(y - centerY, x - centerX);
+        const initialAngle = Math.atan2(
+          dragStart.y - centerY,
+          dragStart.x - centerX
+        );
+        const deltaAngle = angle - initialAngle;
+
+        setAssets((prevAssets) => {
+          const updatedAssets = [...prevAssets];
+          const asset = updatedAssets[selectedAssetIndex];
+          asset.rotation = initialRotation + deltaAngle * (180 / Math.PI);
+          return updatedAssets;
+        });
+        drawCanvas();
+      }
     },
     [
       selectedAssetIndex,
@@ -422,6 +561,13 @@ function CanvasEditor({
   );
 
   const handleMouseUp = () => {
+    setIsDraggingAsset(false);
+    setIsResizing(false);
+    setIsRotating(false);
+    setResizeHandle(null);
+  };
+
+  const handleTouchEnd = () => {
     setIsDraggingAsset(false);
     setIsResizing(false);
     setIsRotating(false);
@@ -467,7 +613,9 @@ function CanvasEditor({
     <div
       className="relative flex flex-col items-center justify-center w-full h-full"
       onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove} // Handle touch move
       onMouseUp={handleMouseUp}
+      onTouchEnd={handleTouchEnd} // Handle touch end
     >
       <canvas
         ref={canvasRef}
@@ -475,6 +623,7 @@ function CanvasEditor({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onMouseDown={handleMouseDownToDragOrResize}
+        onTouchStart={handleTouchStartToDragOrResize} // Handle touch start
         onClick={handleCanvasClick}
       />
     </div>
