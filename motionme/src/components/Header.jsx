@@ -183,14 +183,14 @@ function Header({ isDarkMode, setIsDarkMode }) {
           className="h-12 w-12 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <svg
-            className={`fill-violet-700 ${!isDarkMode ? "block" : "hidden"}`}
+            className={`fill-black ${!isDarkMode ? "block" : "hidden"}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
           </svg>
           <svg
-            className={`fill-yellow-500 ${isDarkMode ? "block" : "hidden"}`}
+            className={`fill-white ${isDarkMode ? "block" : "hidden"}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >

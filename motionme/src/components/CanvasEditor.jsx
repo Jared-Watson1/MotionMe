@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-function CanvasEditor({ selectedFile }) {
+function CanvasEditor({ selectedFile, onImageLoad }) {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
   const [assets, setAssets] = useState([]);
@@ -46,8 +46,13 @@ function CanvasEditor({ selectedFile }) {
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
       imageRef.current = { img, width, height };
+
+      // Pass the image height to the parent component
+      if (onImageLoad) {
+        onImageLoad(height);
+      }
     };
-  }, [selectedFile]);
+  }, [selectedFile, onImageLoad]);
 
   const handleDrop = (event) => {
     event.preventDefault();
@@ -418,7 +423,7 @@ function CanvasEditor({ selectedFile }) {
 
 CanvasEditor.propTypes = {
   selectedFile: PropTypes.object.isRequired,
-  onDownload: PropTypes.func.isRequired,
+  onImageLoad: PropTypes.func.isRequired, // New prop for passing image height
 };
 
 export default CanvasEditor;
