@@ -20,6 +20,7 @@ function App() {
       window.matchMedia("(prefers-color-scheme: light)").matches
     );
   });
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -49,6 +50,16 @@ function App() {
     setClickedAssetSrc(src); // Set the clicked asset source
   };
 
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    // Ensure canvas updates when dragging ends
+    setClickedAssetSrc(clickedAssetSrc); // This will trigger the asset to be added
+  };
+
   return (
     <div className={`min-h-screen flex flex-col container`}>
       <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
@@ -69,6 +80,7 @@ function App() {
               selectedFile={selectedFile}
               onImageLoad={handleImageLoad} // Pass the image load handler
               clickedAssetSrc={clickedAssetSrc} // Pass the clicked asset source
+              isDragging={isDragging} // Pass dragging state to prevent redraws
             />
             <DownloadButton isDarkMode={isDarkMode} />
           </div>
@@ -80,6 +92,8 @@ function App() {
             <AssetList
               isDarkMode={isDarkMode}
               onAssetClick={handleAssetClick}
+              onDragStart={handleDragStart} // Pass drag start handler
+              onDragEnd={handleDragEnd} // Pass drag end handler
               imageHeight={imageHeight} // Pass the image height to AssetList
             />
           </div>

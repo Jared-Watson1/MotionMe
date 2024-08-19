@@ -1,8 +1,13 @@
 import PropTypes from "prop-types";
 
-function AssetItem({ name, src, isDarkMode, onClick }) {
+function AssetItem({ name, src, isDarkMode, onClick, onDragStart, onDragEnd }) {
   const handleDragStart = (event) => {
     event.dataTransfer.setData("asset", src);
+    if (onDragStart) onDragStart(); // Signal the start of dragging
+  };
+
+  const handleDragEnd = () => {
+    if (onDragEnd) onDragEnd(); // Signal the end of dragging
   };
 
   return (
@@ -14,6 +19,7 @@ function AssetItem({ name, src, isDarkMode, onClick }) {
       }`}
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onClick={onClick}
     >
       <img src={src} alt={name} className="max-h-28 object-contain" />
@@ -35,6 +41,8 @@ AssetItem.propTypes = {
   src: PropTypes.string.isRequired,
   isDarkMode: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
+  onDragStart: PropTypes.func,
+  onDragEnd: PropTypes.func,
 };
 
 export default AssetItem;

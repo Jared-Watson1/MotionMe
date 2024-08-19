@@ -58,7 +58,13 @@ const assets = [
   // Add more as needed
 ];
 
-function AssetList({ isDarkMode, onAssetClick, imageHeight }) {
+function AssetList({
+  isDarkMode,
+  onAssetClick,
+  onDragStart,
+  onDragEnd,
+  imageHeight,
+}) {
   const handleScroll = (event) => {
     event.stopPropagation(); // Prevent scroll from propagating to parent elements
   };
@@ -84,6 +90,8 @@ function AssetList({ isDarkMode, onAssetClick, imageHeight }) {
             src={asset.src}
             isDarkMode={isDarkMode}
             onClick={() => onAssetClick(asset.src)}
+            onDragStart={onDragStart} // New prop
+            onDragEnd={onDragEnd} // New prop
           />
         ))}
       </div>
@@ -94,6 +102,8 @@ function AssetList({ isDarkMode, onAssetClick, imageHeight }) {
 AssetList.propTypes = {
   isDarkMode: PropTypes.bool.isRequired,
   onAssetClick: PropTypes.func.isRequired,
+  onDragStart: PropTypes.func, // New prop for drag start
+  onDragEnd: PropTypes.func, // New prop for drag end
   imageHeight: PropTypes.number.isRequired, // Add PropType for imageHeight
 };
 
