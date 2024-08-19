@@ -3,10 +3,39 @@ import PropTypes from "prop-types";
 function DownloadButton({ isDarkMode }) {
   const handleDownload = () => {
     const canvas = document.querySelector("canvas");
+    if (!canvas) return;
+
+    // Convert the canvas to a data URL
+    const imageDataUrl = canvas.toDataURL("image/png");
+
+    // Create a temporary link element
     const link = document.createElement("a");
+    link.href = imageDataUrl;
     link.download = "edited-image.png";
-    link.href = canvas.toDataURL();
-    link.click();
+
+    // For mobile devices, we create a new tab/window for downloading
+    if (window.navigator.msSaveOrOpenBlob) {
+      // For IE and Edge compatibility
+      const blob = canvas.msToBlob();
+      window.navigator.msSaveOrOpenBlob(blob, "edited-image.png");
+    } else {
+      // Other browsers
+      link.click();
+    }
+
+    // Special handling for iOS devices
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad)/i)) {
+      // Open the image in a new window
+      const newWindow = window.open(imageDataUrl, "_blank");
+      // After the image is loaded, prompt the user to save it
+      newWindow.document.title = "Download Image";
+      newWindow.document.body.style.backgroundColor = "black";
+      const img = newWindow.document.createElement("img");
+      img.src = imageDataUrl;
+      img.style.width = "100%";
+      img.style.height = "auto";
+      newWindow.document.body.appendChild(img);
+    }
   };
 
   return (

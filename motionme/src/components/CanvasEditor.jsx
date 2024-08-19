@@ -19,10 +19,10 @@ function CanvasEditor({
   const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
   const [initialRotation, setInitialRotation] = useState(0);
   const [resizeHandle, setResizeHandle] = useState(null);
-  const [rotation, setRotation] = useState(0);
+  const [setRotation] = useState(0);
   const [isAssetAdded, setIsAssetAdded] = useState(false); // New state to track asset addition
 
-  const handleSize = 10; // Size of the resize handles
+  const handleSize = 20; // Size of the resize handles
   const rotateHandleDistance = 30; // Distance of rotate handle from top of the asset
 
   // Draw the entire canvas with the background and all assets
