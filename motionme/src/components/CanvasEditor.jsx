@@ -478,6 +478,7 @@ function CanvasEditor({
       initialRotation,
       resizeHandle,
       drawCanvas,
+      assets,
     ]
   );
 
@@ -565,6 +566,7 @@ function CanvasEditor({
       initialRotation,
       resizeHandle,
       drawCanvas,
+      assets,
     ]
   );
 
@@ -619,7 +621,7 @@ function CanvasEditor({
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center w-full h-full"
+      className="relative flex flex-col items-center justify-center w-full h-full touch-none" // Add touch-none to prevent scrolling
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove} // Handle touch move
       onMouseUp={handleMouseUp}
@@ -627,7 +629,7 @@ function CanvasEditor({
     >
       <canvas
         ref={canvasRef}
-        className="border-4 border-black rounded-lg shadow-lg bg-black"
+        className="border-4 border-black rounded-lg shadow-lg bg-black touch-none" // Add touch-none to prevent scrolling
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onMouseDown={handleMouseDownToDragOrResize}
