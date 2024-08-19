@@ -20,6 +20,10 @@ function DragAndDrop({ onFileChange, isDarkMode }) {
     }
   };
 
+  const handleButtonClick = () => {
+    document.getElementById("dropzone-file").click();
+  };
+
   return (
     <div
       className="flex items-center justify-center w-full mb-4 mt-3"
@@ -49,6 +53,7 @@ function DragAndDrop({ onFileChange, isDarkMode }) {
                 ? "bg-white text-black hover:bg-gray-800 hover:text-white"
                 : "bg-black text-white hover:bg-gray-200 hover:text-black"
             }`}
+            onClick={handleButtonClick}
           >
             + Upload an image
           </button>
